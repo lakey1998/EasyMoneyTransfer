@@ -22,9 +22,10 @@ public class transfer {
     private int senderAc;
     private int recieverAc;
     private int amount;
-    private int secretKey;
+    private String secretKey;
     private LocalDate date;
     private LocalTime time;
     private String status;
+
 
 }
