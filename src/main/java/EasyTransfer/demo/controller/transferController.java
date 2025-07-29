@@ -1,30 +1,57 @@
 package EasyTransfer.demo.controller;
 
 
+import EasyTransfer.demo.exception.apiException;
 import EasyTransfer.demo.service.QRUserService;
 import EasyTransfer.demo.service.transferService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/transfer")
+@RequestMapping("/user/transfer")
 public class transferController {
 
     @Autowired
     private transferService transferService;
 
     @PostMapping("/receiveMoney")
-    public BufferedImage recieveMoney()throws Exception{
+    public BufferedImage recieveMoney() throws Exception {
         return transferService.generateQR();
     }
 
     @PostMapping("/sendMoney")
-    public String readQR(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<?> readQR(@RequestBody Map<String, String> payload) { //QR code reader from the front end
         String qrtext = payload.get("qrtext");
-        return transferService.transfer(qrtext);
+
+        try {
+            int transferId = transferService.validatSecret(qrtext);
+
+            HashMap<String, Object> response = new HashMap<>();
+            response.put("status", "valid");
+            response.put("transferId", transferId);
+            response.put("message", "QR Validated! Enter the amount and the note");
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            apiException error = new apiException(404, "QR code not found", "/transfer/sendMoney");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
     }
 
+    @PostMapping("/confirmTansfer") //Second API for the sender to confirm transaction and Enter the amount and note
+                         //Map the amount and the note with transfer ID that before api returned
+    public ResponseEntity<?> confirmTransfer(@RequestBody Map<String,Object> payload){
+        int transferId = (int) payload.get("transferId");
+        double amount = (double) payload.get("amount");
+        String note = payload.get("note").toString();
+
+        transferService.sendMoney(transferId, amount, note);
+    }
 }

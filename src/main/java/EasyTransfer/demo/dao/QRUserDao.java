@@ -13,6 +13,12 @@ public interface QRUserDao extends JpaRepository<QRUser, Integer> {
 
     }
 
-    @Query("SELECT accountNumber FROM account a WHERE a.Id = :userId")
-    int findAccountNumber(int userId);
+    @Query("SELECT * FROM QRUser a WHERE a.accountNum = :accountNum")
+    QRUser findByAccountNum(long accountNum);
+
+    @Query("UPDATE QRUser a SET 'active' WHERE a.accountNum = :accountNum")
+    QRUser activateAccount(long accountNum);
+
+    @Query("SELECT a.status FROM QRUser a WHERE a.accountNum=:accountNum")
+    QRUser isActive(long accountNum);
 }

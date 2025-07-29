@@ -1,13 +1,17 @@
 package EasyTransfer.demo.service;
 
 import EasyTransfer.demo.dao.transferDao;
+import EasyTransfer.demo.exception.apiException;
 import EasyTransfer.demo.model.transfer;
-import com.google.zxing.qrcode.QRCodeWriter;
+import EasyTransfer.demo.model.userPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.awt.image.BufferedImage;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Service
 public class transferService {
@@ -24,37 +28,45 @@ public class transferService {
     @Autowired
     private transferDao dao;
 
+    @Autowired
+    private userPrincipal userPrincipal;
+
 
     public BufferedImage generateQR() throws Exception {
-        int passLength = 12 ;           //Initialize the onetime verification password here
-        int Id = 0 ;
-        int accno = user.getAccountNum(Id);
+        int passLength = 12 ;           //Initialize the onetime verification password length here
         String secret = randomPass.generatePassword(passLength);
 
+        long receiver = Long.parseLong(userPrincipal.getUsername());
+
         transfer newTransfer = new transfer();
-        newTransfer.setRecieverAc(accno);
         newTransfer.setSecretKey(secret);
+
+        newTransfer.setReciever(Long.parseLong(userPrincipal.getUsername()));
+        newTransfer.setSender(00);
         newTransfer.setDate(null);
         newTransfer.setTime(null);
-        newTransfer.setSenderAc(00);
         newTransfer.setAmount(00);
         newTransfer.setStatus("Pending");
 
         dao.save(newTransfer);
-
         return QR.createQR(secret);
 
     }
 
-    public String transfer(String qrtext){
-        int senderId = 01 ;
-        int tempId = dao.findId(qrtext);
+    public int validatSecret(String secretKey){
+        return dao.findId(secretKey);     }
 
-        int sederac = user.getAccountNum(senderId);
-       // int amount =
-
-        return "Success";
+    public void sendMoney(int transferId, double amount, String note) {
+        int transferID = transferId;
+        long sender = Long.parseLong(userPrincipal.getUsername());
+        double lastAmount =amount;
+        String lastnote = note;
+        LocalDate date = LocalDate.now();
+        LocalTime time = LocalTime.now();
+        String status = "Success";
+         dao.update(transferID, sender, lastAmount, note, date, time, status);
     }
-
-    //public getDetails(@RequestBody )
 }
+
+
+

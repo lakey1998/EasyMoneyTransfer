@@ -3,6 +3,7 @@ package EasyTransfer.demo.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,9 +20,10 @@ public class transfer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int transferID;
-    private int senderAc;
-    private int recieverAc;
-    private int amount;
+    private long sender;
+    private long reciever;
+    private double amount;
+    private String note;
     private String secretKey;
     private LocalDate date;
     private LocalTime time;
