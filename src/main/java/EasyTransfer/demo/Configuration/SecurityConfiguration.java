@@ -36,16 +36,11 @@ public class SecurityConfiguration {
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
+        provider.setPasswordEncoder(new BcryptPasswordEncorder(12);
         provider.setUserDetailsService(userDetailsService);
         return provider;
     }
 
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception{
-//        http.authorizeRequests()
-//                .anyRequest("/admin").hasRole("ADMIN")
-//                .anyRequest("/user").hasRole("USER","ADMIN");
-//    }
+
 
 }
