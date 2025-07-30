@@ -23,9 +23,8 @@ public class QRUserService {
     public String register(long accountNum, String password) {
         QRUser account = new QRUser();
         account.setAccountNum(accountNum);
-        account.setPassword(password);
-       // account.setPassword(encorder.encode(user.getPassword()));
-        //set authentication provider as bcrypt using to read that type of passwords
+       // account.setPassword(password);
+        account.setPassword(encorder.encode(password);
         account.setDate(LocalDate.now());
         account.setTime(LocalTime.now());
         account.setStatus("Active");
