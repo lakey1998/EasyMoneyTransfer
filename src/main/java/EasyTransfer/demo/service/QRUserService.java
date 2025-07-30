@@ -59,5 +59,14 @@ public class QRUserService {
         return result == "Active";
 
     }
+
+    public double findAmount(long sender) {
+        return repo.findAmountByAccountNum(sender);
+    }
+
+
+    public void updateAmount(long sender, double lastAmount) {
+        repo.updateAmount(sender, lastAmount);
+    }
 }
 

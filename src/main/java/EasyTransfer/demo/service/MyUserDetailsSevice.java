@@ -8,15 +8,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-public class MyUserDetailsSevice implements UserDetailsService {
+public abstract class MyUserDetailsSevice implements UserDetailsService {
 
     @Autowired
     private QRUserDao repo;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+    public UserDetails loadUserByUsername(long accountNum) throws UsernameNotFoundException {
         //we are serching by its account number because of that username wanna change to account number
-        QRUser user = repo.findByUsername(username);
+        QRUser user = repo.findByAccountNum(accountNum);
 
         if(user == null){
             System.out.println("User not found");

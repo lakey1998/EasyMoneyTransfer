@@ -16,4 +16,7 @@ public interface transferDao extends JpaRepository<transfer, Integer> {
 
     @Query("UPDATE transfer t SET t.sender = :sender, t.amount = :lastAmount, t.note =:note, t.date = :date, t.time = :time, t.status = :status WHERE t.transferId = :transferId")
     String update(int transferID, long sender, double lastAmount, String note, LocalDate date, LocalTime time, String status);
+
+    @Query("SELECT receiver FROM transfer a WHERE a.transferID = :transferID")
+    int findReceiverById(int transferID);
 }

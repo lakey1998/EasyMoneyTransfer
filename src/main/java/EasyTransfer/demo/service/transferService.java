@@ -33,30 +33,34 @@ public class transferService {
 
 
     public BufferedImage generateQR() throws Exception {
-        int passLength = 12 ;           //Initialize the onetime verification password length here
+        int passLength = 12;           //Initialize the onetime verification password length here
         String secret = randomPass.generatePassword(passLength);
 
         long receiver = Long.parseLong(userPrincipal.getUsername());
 
-        transfer newTransfer = new transfer();
-        newTransfer.setSecretKey(secret);
+        if (user.isActive(receiver)) {
+            transfer newTransfer = new transfer();
+            newTransfer.setSecretKey(secret);
 
-        newTransfer.setReciever(Long.parseLong(userPrincipal.getUsername()));
-        newTransfer.setSender(00);
-        newTransfer.setDate(null);
-        newTransfer.setTime(null);
-        newTransfer.setAmount(00);
-        newTransfer.setStatus("Pending");
+            newTransfer.setReciever(Long.parseLong(userPrincipal.getUsername()));
+            newTransfer.setSender(00);
+            newTransfer.setDate(null);
+            newTransfer.setTime(null);
+            newTransfer.setAmount(00);
+            newTransfer.setStatus("Pending");
 
-        dao.save(newTransfer);
-        return QR.createQR(secret);
+            dao.save(newTransfer);
+            return QR.createQR(secret);
 
+        }else throw new Exception("Your account is not at active status");
     }
 
     public int validatSecret(String secretKey){
-        return dao.findId(secretKey);     }
+        return dao.findId(secretKey);
+        }
 
-    public void sendMoney(int transferId, double amount, String note) {
+    public String sendMoney(int transferId, double amount, String note) {
+
         int transferID = transferId;
         long sender = Long.parseLong(userPrincipal.getUsername());
         double lastAmount =amount;
@@ -64,7 +68,25 @@ public class transferService {
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.now();
         String status = "Success";
-         dao.update(transferID, sender, lastAmount, note, date, time, status);
+
+        if (user.isActive(sender)) {
+            double senderAmount = user.findAmount(sender);
+            if (senderAmount > lastAmount) {
+                double newSenderAmount = senderAmount - lastAmount;
+                user.updateAmount(sender, lastAmount);          //Update sender amount
+
+                long receiverAccount = dao.findReceiverById(transferID);
+                double receiverAmount = user.findAmount(receiverAccount);
+                double newReceiverAmount = receiverAmount + lastAmount;
+                user.updateAmount(receiverAccount, newReceiverAmount);       //Update receiver amount
+
+                dao.update(transferID, sender, lastAmount, note, date, time, status);
+                return "Transfer complete Successful";
+            } else
+                return "Insufficient Account Balance";
+        }else
+            return "Your account is not at active status";
+
     }
 }
 

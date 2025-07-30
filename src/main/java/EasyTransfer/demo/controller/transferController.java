@@ -21,8 +21,14 @@ public class transferController {
     private transferService transferService;
 
     @PostMapping("/receiveMoney")
-    public BufferedImage recieveMoney() throws Exception {
-        return transferService.generateQR();
+    public ResponseEntity<?> recieveMoney() {
+        try {
+            transferService.generateQR();
+            return new ResponseEntity<>(transferService.generateQR(),HttpStatus.OK);
+        } catch (Exception e) {
+            apiException error = new apiException(404,"QR generate incomplete!","transfer/sendMoney");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
 
     @PostMapping("/sendMoney")
@@ -48,10 +54,16 @@ public class transferController {
     @PostMapping("/confirmTansfer") //Second API for the sender to confirm transaction and Enter the amount and note
                          //Map the amount and the note with transfer ID that before api returned
     public ResponseEntity<?> confirmTransfer(@RequestBody Map<String,Object> payload){
-        int transferId = (int) payload.get("transferId");
-        double amount = (double) payload.get("amount");
-        String note = payload.get("note").toString();
+        try {
+            int transferId = (int) payload.get("transferId");
+            double amount = (double) payload.get("amount");
+            String note = payload.get("note").toString();
 
-        transferService.sendMoney(transferId, amount, note);
+            String response=transferService.sendMoney(transferId,amount,note);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }catch(Exception e){
+            apiException error = new apiException(404,"Transfer not completed","transfer/sendMoney");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
     }
 }
