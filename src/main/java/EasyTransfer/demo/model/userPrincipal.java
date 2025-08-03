@@ -6,7 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.stream.Collectors;
 
 public class userPrincipal implements UserDetails {
 
@@ -22,9 +22,10 @@ public class userPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return user.getUserRoles().stream()  // Assuming userRoles is Collection<Role>
+                .map(Role::toAuthority)  // Method reference to conversion method
+                .collect(Collectors.toList());
     }
-
     @Override
     public String getPassword() {
         return user.getPassword();

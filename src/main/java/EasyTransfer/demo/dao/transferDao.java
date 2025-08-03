@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Repository
 public interface transferDao extends JpaRepository<transfer, Integer> {
@@ -19,4 +20,16 @@ public interface transferDao extends JpaRepository<transfer, Integer> {
 
     @Query("SELECT receiver FROM transfer a WHERE a.transferID = :transferID")
     int findReceiverById(int transferID);
+
+    @Query("SELECT * FROM transfer a WHERE a.receiver = :accountNum")
+    List<transfer> findReceive(long accountNum);
+
+    @Query("SELECT * FROM transfer a WHERE a.sender = :accountNum")
+    List<transfer> findSend(long accountNum);
+
+    @Query("SELECT * FROM transfer")
+    List<transfer> History();
+
+    @Query("SELECT * FROM transfer a WHERE a.sender = :accountNum OR a.receiver = :accountNum")
+    List<transfer> History(long accountNum);
 }

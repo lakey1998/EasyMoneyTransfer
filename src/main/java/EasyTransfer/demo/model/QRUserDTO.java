@@ -12,7 +12,7 @@ import java.time.LocalTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class QRUserProjection {
+public class QRUserDTO {
 
     private long accountnumber;
     private String password;

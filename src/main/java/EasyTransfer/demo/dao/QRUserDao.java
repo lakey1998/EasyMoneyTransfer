@@ -27,4 +27,10 @@ public interface QRUserDao extends JpaRepository<QRUser, Integer> {
 
     @Query("UPDATE QRUser b SET b.amount = :lastAmount WHERE b.accountNum = :accountNum ")
     void updateAmount(long accountNum, double lastAmount);
+
+    @Query("SELECT password FROM QRUser a WHERE a.accountNum = :accountNum")
+    String getPassword(long accountNum);
+
+    @Query("SELECT balance FROM QRUser a WHERE a.accountNum = :accountNum")
+    double findBalanceById(long accountNum);
 }
